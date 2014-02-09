@@ -81,7 +81,6 @@ class Chef::Application::LXC < Chef::Application
     end
     Chef::Config[:solo] = true
     ct = ::LXC::Container.new(ARGV.first)
-    client = Chef::Client.new
     client.ohai.load_plugins
     ct.execute do
       client.run_ohai
@@ -93,6 +92,14 @@ class Chef::Application::LXC < Chef::Application
       runner = Chef::Runner.new(run_context)
       runner.converge
     end
+  end
+
+  def client
+    @client ||= Class.new(Chef::Client) do
+      def run_ohai
+        ohai.run_plugins
+      end
+    end.new
   end
 
   def run_application

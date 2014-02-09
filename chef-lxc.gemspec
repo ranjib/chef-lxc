@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.bindir        = "bin"
 
-  spec.add_dependency "chef"
+  spec.add_dependency "chef", "= 11.8.4.ohai7.0"
   spec.add_dependency "ruby-lxc"
   spec.add_dependency "lxc-extra"
 
