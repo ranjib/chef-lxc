@@ -5,32 +5,43 @@ class Chef
     class Lxc < Chef::Resource
 
       class LXCTemplate
+        attr_reader :type, :bd, :options
+        def initialize(type='ubuntu')
+          @type = type
+          @bd = nil
+          @options = []
+        end
+
+        def args(args)
+          @options = args
+        end
+
+        def block_device(bd)
+          @bd = bd
+        end
       end
 
       identity_attr :container_name
+      attr_reader :lxc_template
 
       def initialize(name, run_context = nil)
         super
         @resource_name = :container
         @container_name = name
-        @options = {}
         @provider = Chef::Provider::Lxc
         @action = :create
         @allowed_actions += [:start, :stop, :destroy, :create]
+        @lxc_template = LXCTemplate.new
       end
 
       def container_name(arg = nil)
         set_or_return(:container_name, arg, kind_of: [ String ] )
       end
 
-      def options(arg = nil)
-        set_or_return(:options, arg, kind_of: [ Hash ] )
-      end
-
-      def template(type, &block)
-        t =  LXCTemplate.new(type)
+      def template(type = 'ubuntu', &block)
+        @lxc_template = LXCTemplate.new(type)
         if block_given?
-          t.instance_eval(&block)
+          @lxc_template.instance_eval(&block)
         end
       end
     end

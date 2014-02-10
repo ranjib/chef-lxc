@@ -25,11 +25,10 @@ class Chef
       def action_create
         unless ct.defined?
           converge_by("create container '#{ct.name}'") do
-            opts = @new_resource.options
-            template = opts[:template] || 'ubuntu'
-            block_device = opts[:block_device] || nil
-            template_options = opts[:template_options] || []
-            flags = opts[:flags] || 0
+            template = new_resource.lxc_template.type
+            block_device = new_resource.lxc_template.bd
+            template_options = new_resource.lxc_template.options
+            flags = 0
             ct.create(template, block_device, flags, template_options)
           end
         end

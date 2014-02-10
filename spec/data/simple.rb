@@ -1,3 +1,3 @@
 require 'chef/lxc'
 
-lxc "foo"
+lxc "chef"
