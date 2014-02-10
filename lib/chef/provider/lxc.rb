@@ -3,7 +3,7 @@ require 'lxc'
 
 class Chef
   class Provider
-    class Container < Chef::Provider
+    class Lxc < Chef::Provider
 
       attr_reader :ct
 
@@ -16,7 +16,7 @@ class Chef
       end
 
       def load_current_resource
-        @ct = LXC::Container.new(new_resource.container_name)
+        @ct = ::LXC::Container.new(new_resource.container_name)
         if (new_resource.action == 'start') or (new_resource.action == 'stop')
           raise ArgumentError, 'Can not start or stop non-existent container'
         end
