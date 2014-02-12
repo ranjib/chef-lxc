@@ -4,6 +4,9 @@ class Chef
   class Resource
     class Lxc < Chef::Resource
 
+      class InlineRecipe
+      end
+
       class LXCTemplate
         attr_reader :type, :bd, :options
         def initialize(type='ubuntu')
@@ -22,7 +25,7 @@ class Chef
       end
 
       identity_attr :container_name
-      attr_reader :lxc_template
+      attr_reader :lxc_template, :recipe_block
 
       def initialize(name, run_context = nil)
         super
@@ -32,6 +35,7 @@ class Chef
         @action = :create
         @allowed_actions += [:start, :stop, :destroy, :create]
         @lxc_template = LXCTemplate.new
+        @recipe_block = nil
       end
 
       def container_name(arg = nil)
@@ -43,6 +47,10 @@ class Chef
         if block_given?
           @lxc_template.instance_eval(&block)
         end
+      end
+
+      def recipe(&block)
+        @recipe_block = block
       end
     end
   end

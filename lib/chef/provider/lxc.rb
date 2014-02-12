@@ -48,6 +48,9 @@ class Chef
             ct.start
           end
         end
+        unless new_resource.recipe_block.nil?
+          run_recipe
+        end
       end
 
       def action_destroy
@@ -56,6 +59,29 @@ class Chef
             ct.destroy
           end
         end
+      end
+
+      def run_recipe
+        client.ohai.load_plugins
+        ct.execute do
+          Chef::Config[:solo] = true
+          client.run_ohai
+          client.load_node
+          client.build_node
+          run_context = Chef::RunContext.new(client.node, {}, client.events)
+          recipe = Chef::Recipe.new(new_resource.name,'inline', run_context)
+          recipe.instance_eval(&new_resource.recipe_block)
+          runner = Chef::Runner.new(run_context)
+          runner.converge
+        end
+      end
+
+      def client
+        @client ||= Class.new(Chef::Client) do
+          def run_ohai
+            ohai.run_plugins
+          end
+        end.new
       end
     end
   end
