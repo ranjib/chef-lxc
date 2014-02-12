@@ -1,9 +1,9 @@
 # Chef::Lxc
 
-[Chef]() itegration for [LXC]().
+[Chef](http://www.getchef.com/) integration for [LXC](http://linuxcontainers.org/).
 
 ## Installation
-Note: This gem depends on [ruby-lxc](), a native liblxc binding, ruby-lxc will be
+Note: This library depends on [ruby-lxc](https://github.com/lxc/ruby-lxc), a native liblxc binding, ruby-lxc will be
 released around April, 2014(alongside LXC 1.0, Ubuntu 14.04 release). Till then,
 use bundler to experiement with chef-lxc.
 
@@ -21,40 +21,40 @@ Or install it yourself as:
 
 ## Usage
 - Execute a chef recipe against a running container (like chef-apply)
-```sh
-lxc-create -n test -t ubuntu
-lxc-start -n test -d
-chef-lxc test -e 'package "screen"' # via command line
-```
+  ```sh
+  lxc-create -n test -t ubuntu
+  lxc-start -n test -d
+  chef-lxc test -e 'package "screen"' # via command line
+  ```
 or stream a recipe
-```
-echo 'package "vim"' | sudo ~/.rbenv/shims/bundle exec chef-lxc chef -s
-```
+  ```sh
+  echo 'package "vim"' | sudo bundle exec chef-lxc chef -s
+  ```
 or supply a file
-```sh
-chef-lxc test /path/to/recipe.rb
-```
+  ```sh
+  chef-lxc test /path/to/recipe.rb
+  ```
 
 - Create & manage containers (inside chef recipes)
 Following will create a default (ubuntu) container named `web`
-```ruby
-lxc "web"
-```
+  ```ruby
+  lxc "web"
+  ```
 A more elaborate example,
-```ruby
-lxc "web" do
-  template "ubuntu"
+  ```ruby
+  lxc "web" do
+    template "ubuntu"
 
-  recipe do
-    package "apache2"
-    service "apache2" do
-      action [:start, :enable]
+    recipe do
+      package "apache2"
+      service "apache2" do
+        action [:start, :enable]
+      end
     end
-  end
 
-  action [:create, :start]
-end
-```
+    action [:create, :start]
+  end
+  ```
 
 ## Contributing
 
