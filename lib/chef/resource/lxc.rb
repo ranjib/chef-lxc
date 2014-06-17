@@ -8,19 +8,15 @@ class Chef
       end
 
       class LXCTemplate
-        attr_reader :type, :bd, :options
-        def initialize(type='ubuntu')
+        attr_reader :type, :options
+
+        def initialize(type='download')
           @type = type
-          @bd = nil
-          @options = []
+          @options = %w{-d ubuntu -r trusty -a amd64}
         end
 
         def args(args)
           @options = args
-        end
-
-        def block_device(bd)
-          @bd = bd
         end
       end
 
@@ -36,10 +32,25 @@ class Chef
         @allowed_actions += [:start, :stop, :destroy, :create]
         @lxc_template = LXCTemplate.new
         @recipe_block = nil
+        @block_device = nil
+        @bdev_specs = {}
+        @flags = 0
       end
 
       def container_name(arg = nil)
         set_or_return(:container_name, arg, kind_of: [ String ] )
+      end
+
+      def flags(arg = nil)
+        set_or_return(:flags, arg, kind_of: [ Fixnum ] )
+      end
+
+      def block_device(arg = nil)
+        set_or_return(:block_device, arg, kind_of: [ String ] )
+      end
+
+      def bdev_specs(arg = nil)
+        set_or_return(:bdev_specs, arg, kind_of: [ Hash ] )
       end
 
       def template(type = 'ubuntu', &block)
