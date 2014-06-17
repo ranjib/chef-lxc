@@ -35,7 +35,21 @@ class Chef
               new_resource.flags,
               new_resource.lxc_template.options
             )
+            update_config
           end
+        end
+      end
+
+      def update_config
+        updated_items = []
+        new_resource.config.each do |key, expected_value|
+          if ct.config_item(key) != expected_value
+            ct.set_config_item(key, expected_value)
+            updated_items << key
+          end
+        end
+        unless updated_items.empty?
+          ct.save_config
         end
       end
 
@@ -47,10 +61,22 @@ class Chef
         end
       end
 
+      def action_reboot
+        converge_by("reboot container '#{ct.name}'") do
+          ct.reboot
+        end
+      end
+
       def action_start
         unless ct.running?
           converge_by("start container '#{ct.name}'") do
             ct.start
+            if new_resource.wait_for_network
+              until ct.ip_addresses.empty?
+                Chef::Log.debug('waiting for ip allocation')
+                sleep 1
+              end
+            end
           end
         end
         unless new_resource.recipe_block.nil?
@@ -68,7 +94,7 @@ class Chef
 
       def run_recipe
         client.ohai.load_plugins
-        ct.execute do
+        ct.execute() do
           Chef::Config[:solo] = true
           client.run_ohai
           client.load_node

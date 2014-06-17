@@ -4,9 +4,6 @@ class Chef
   class Resource
     class Lxc < Chef::Resource
 
-      class InlineRecipe
-      end
-
       class LXCTemplate
         attr_reader :type, :options
 
@@ -29,16 +26,26 @@ class Chef
         @container_name = name
         @provider = Chef::Provider::Lxc
         @action = :create
-        @allowed_actions += [:start, :stop, :destroy, :create]
+        @allowed_actions += [:start, :stop, :destroy, :create, :reboot]
         @lxc_template = LXCTemplate.new
         @recipe_block = nil
         @block_device = nil
         @bdev_specs = {}
         @flags = 0
+        @config = {}
+        @wait_for_network = true
       end
 
       def container_name(arg = nil)
         set_or_return(:container_name, arg, kind_of: [ String ] )
+      end
+
+      def wait_for_network(arg = nil)
+        set_or_return(:wait_for_network, arg, kind_of: [ TrueClass, FalseClass ] )
+      end
+
+      def config(arg=nil)
+        set_or_return(:config, arg, kind_of: [ Hash ] )
       end
 
       def flags(arg = nil)
