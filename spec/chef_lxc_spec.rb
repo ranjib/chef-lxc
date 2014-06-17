@@ -4,12 +4,11 @@ require 'chef/application/lxc'
 describe Chef::Application::LXC do
   before(:all) do
     c = LXC::Container.new('test')
-    c.create('ubuntu') unless c.defined?
+    c.create('download', nil, {}, 0, %w{-d ubuntu -r trusty -a amd64}) unless c.defined?
     c.start unless c.running?
   end
   after(:all) do
-    c = LXC::Container.new('test')
-    c.stop if c.running?
+    destroy_ct
   end
   it 'should install a package inside a container' do
     app = Chef::Application::LXC.new

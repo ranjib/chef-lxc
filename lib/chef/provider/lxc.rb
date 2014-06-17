@@ -26,10 +26,15 @@ class Chef
         unless ct.defined?
           converge_by("create container '#{ct.name}'") do
             template = new_resource.lxc_template.type
-            block_device = new_resource.lxc_template.bd
             template_options = new_resource.lxc_template.options
             flags = 0
-            ct.create(template, block_device, flags, template_options)
+            ct.create(
+              new_resource.lxc_template.type,
+              new_resource.block_device,
+              new_resource.bdev_specs,
+              new_resource.flags,
+              new_resource.lxc_template.options
+            )
           end
         end
       end
