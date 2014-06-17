@@ -17,6 +17,11 @@ module LXCSpecHelper
     command.run_command
     command
   end
+  def destroy_ct
+    c = LXC::Container.new('chef')
+    c.stop if c.running?
+    c.destroy if c.defined?
+  end
 end
 
 RSpec.configure do |config|
