@@ -9,6 +9,7 @@ require 'fileutils'
 require 'tempfile'
 require 'chef/providers'
 require 'chef/resources'
+require 'digest/md5'
 
 class Chef::Application::LXC < Chef::Application
 
