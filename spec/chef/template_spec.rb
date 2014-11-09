@@ -30,6 +30,6 @@ describe 'Chef lxc resource/provider' do
     version = ct.execute do
         `lsb_release -a`
       end
-    expect(version).to match(/10\.04/)
+    expect(version).to match(/14\.04/)
   end
 end

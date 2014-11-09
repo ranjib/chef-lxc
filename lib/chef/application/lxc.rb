@@ -1,10 +1,10 @@
 require 'chef'
 require 'highline'
-require 'chef/lxc'
 require 'chef/application'
 require 'chef/client'
 require 'chef/config'
 require 'chef/log'
+require 'chef/lxc_helper'
 require 'fileutils'
 require 'tempfile'
 require 'chef/providers'
@@ -12,6 +12,7 @@ require 'chef/resources'
 require 'digest/md5'
 
 class Chef::Application::LXC < Chef::Application
+  include Chef::LXCHelper
 
   banner "Usage: chef-lxc CONTAINER [RECIPE_FILE] [-e RECIPE_TEXT] [-s]"
 
@@ -82,25 +83,7 @@ class Chef::Application::LXC < Chef::Application
     end
     Chef::Config[:solo] = true
     ct = ::LXC::Container.new(ARGV.first)
-    client.ohai.load_plugins
-    ct.execute do
-      client.run_ohai
-      client.load_node
-      client.build_node
-      run_context = Chef::RunContext.new(client.node, {}, client.events)
-      recipe = Chef::Recipe.new("(chef-lxc cookbook)", "(chef-lxc recipe)", run_context)
-      recipe.instance_eval(recipe_text, '/foo/bar.rb', 1)
-      runner = Chef::Runner.new(run_context)
-      runner.converge
-    end
-  end
-
-  def client
-    @client ||= Class.new(Chef::Client) do
-      def run_ohai
-        ohai.run_plugins
-      end
-    end.new
+    recipe_in_container(ct, text: recipe_text)
   end
 
   def run_application
