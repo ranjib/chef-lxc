@@ -80,7 +80,7 @@ class Chef
           end
         end
         unless new_resource.recipe_block.nil?
-          recipe_in_container(ct, block: new_resource.recipe_block)
+          recipe_in_container(ct, &new_resource.recipe_block)
         end
       end
 

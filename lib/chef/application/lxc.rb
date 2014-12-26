@@ -79,11 +79,11 @@ class Chef::Application::LXC < Chef::Application
     elsif config[:stdin]
       recipe_text = STDIN.read
     else
-      recipe_text = ::File.read(ARGV[1])
+      recipe_text = ::File.read(ARGV.first)
     end
     Chef::Config[:solo] = true
     ct = ::LXC::Container.new(ARGV.first)
-    recipe_in_container(ct, text: recipe_text)
+    recipe_in_container(ct, recipe_text)
   end
 
   def run_application
