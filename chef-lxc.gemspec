@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["ranjib@linux.com"]
   spec.description   = %q{LXC bindings for Chef}
   spec.summary       = spec.description
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/ranjib/chef-lxc"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
