@@ -3,23 +3,21 @@
 [Chef](http://www.getchef.com/) integration for [LXC](http://linuxcontainers.org/).
 
 ## Installation
-Note: This library depends on [ruby-lxc](https://github.com/lxc/ruby-lxc), a native liblxc binding, ruby-lxc will be
-released around April, 2014(alongside LXC 1.0, Ubuntu 14.04 release). Till then,
-use bundler to experiement with chef-lxc.
+This library depends on [ruby-lxc](https://github.com/lxc/ruby-lxc), a native liblxc binding.
 
-Add this line to your application's Gemfile:
-
-    gem 'chef-lxc', github: 'ranjib/chef-lxc'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Use standard rubygem way to install chef-lxc
 
     $ gem install chef-lxc
 
 ## Usage
+
+There are three ways you can use chef-lxc.
+* Use the command line tool
+* Use the lxc resource/provider from any chef recipe
+* Use the Chef::LXCHelper module from any arbitrary ruby script.
+
+### CLI examples
+
 - Execute a chef recipe against a running container (like chef-apply)
   ```sh
   lxc-create -n test -t ubuntu
@@ -34,14 +32,17 @@ or supply a file
   ```sh
   chef-lxc test /path/to/recipe.rb
   ```
+### Chef resource/provider examples
 
-- Create & manage containers (inside chef recipes)
-Following will create a default (ubuntu) container named `web`
+- Create & manage containers (inside chef recipes), named `web`
   ```ruby
+  require 'chef/lxc'
   lxc "web"
   ```
 A more elaborate example,
   ```ruby
+  require 'chef/lxc'
+
   lxc "web" do
     template "ubuntu"
 
@@ -53,6 +54,26 @@ A more elaborate example,
     end
 
     action [:create, :start]
+  end
+  ```
+
+### Use Chef-Lxc from arbitrary ruby code
+- Install openssh-server package on a vanilla un-privileged ubuntu container and change the default ubuntu user's password
+
+  ```ruby
+  require 'lxc'
+  require 'chef'
+  require 'chef/lxc'
+
+  include Chef::LXCHelper
+
+  ct = LXC::Container.new('foo')
+  ct.create('download', nil, {}, 0, %w{-a amd64 -r trusty -d ubuntu}) # reference: http://www.rubydoc.info/gems/ruby-lxc/LXC/Container#create-instance_method
+  ct.start
+  sleep 5 # wait till network is up and DHCP allocates the IP
+  recipe_in_container(ct) do
+    package 'openssh-server'
+    execute 'echo "ubuntu:ubuntu" | chpasswd'
   end
   ```
 
