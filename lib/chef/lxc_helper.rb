@@ -16,7 +16,7 @@ class Chef
         client.load_node
         client.build_node
         run_context = Chef::RunContext.new(client.node, {}, client.events)
-        recipe = Chef::Recipe.new("chef-loxc-cookbook", "chef-lxc-recipe", run_context)
+        recipe = Chef::Recipe.new('chef-lxc-cookbook', 'chef-lxc-recipe', run_context)
         recipe.instance_eval(&recipe_block) if recipe_block
         recipe.instance_eval(recipe_text, __FILE__, __LINE__) if recipe_text
         runner = Chef::Runner.new(run_context)
