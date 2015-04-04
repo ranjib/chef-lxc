@@ -55,7 +55,7 @@ describe Chef::LXC::Fleet do
     ct = fleet.container('test-container')
     expect(ct).to be_kind_of(::LXC::Container)
     expect(ct.name).to eq('test-container')
-    expect(ct).to respond_to(:run_recipe)
+    expect(ct).to respond_to(:recipe)
     expect(ct).to respond_to(:command)
   end
 

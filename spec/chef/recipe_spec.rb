@@ -24,14 +24,4 @@ describe 'inline recipe' do
   it 'container should be running' do
     expect(ct.running?).to be(true)
   end
-
-  it 'should create test directory' do
-    expect(file('/opt/test')).to be_directory
-  end
-
-  it 'should install apach2 package'
-
-  it 'should start apache2 service'
-
-  it 'should enable apache2 service'
 end
