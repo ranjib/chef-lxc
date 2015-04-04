@@ -1,4 +1,5 @@
 require 'chef/lxc'
+require 'pry'
 
 module LXCSpecHelper
   def execute_recipe(recipe)
