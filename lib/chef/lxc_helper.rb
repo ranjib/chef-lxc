@@ -1,5 +1,6 @@
 require 'lxc'
 require 'lxc/extra'
+require 'mixlib/shellout'
 
 class Chef
   module LXCHelper

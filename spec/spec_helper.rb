@@ -1,10 +1,5 @@
-
 require 'chef/lxc'
-require 'serverspec'
-
-include SpecInfra::Helper::Lxc
-include SpecInfra::Helper::Debian
-
+require 'pry'
 
 module LXCSpecHelper
   def execute_recipe(recipe)
@@ -29,6 +24,5 @@ RSpec.configure do |config|
   config.filter_run(focus: true)
   config.include LXCSpecHelper
   config.run_all_when_everything_filtered = true
-  config.lxc = "chef"
   config.backtrace_exclusion_patterns = []
 end
