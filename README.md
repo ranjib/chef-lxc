@@ -141,15 +141,26 @@ Following is an example:
 
     # Upload cookbooks, data bags, create roles
     fleet.upload_cookbooks(cookbook_path)
+    fleet.create_environment('sandbox')
     fleet.create_role('memcached', 'recipe[memcached]')
+    fleet.create_role('db', 'recipe[mysel::server]')
+    fleet.create_role('web', 'recipe[apache]', 'recipe[php]')
+
     fleet.create_container('memcached', from: 'base') do |ct|
-      ct.command('chef-client -r role[memcached]')
+      ct.command('chef-client -r role[memcached] -E sandbox')
+    end
+    fleet.create_container('db', from: 'base') do |ct|
+      ct.command('chef-client -r role[mysql] -E sandbox')
+    end
+    fleet.create_container('web', from: 'base') do |ct|
+      ct.command('chef-client -r role[web] -E sandbox')
     end
   end
 
   tempfile.unlink
   server.stop
   ```
+
 
 ## Contributing
 

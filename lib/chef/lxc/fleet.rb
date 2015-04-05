@@ -38,7 +38,7 @@ class Chef
           sleep 1
         end
         yield ct if block_given?
-        ct.stop
+        ct.stop if opts[:stop_after]
         ct
       end
 
