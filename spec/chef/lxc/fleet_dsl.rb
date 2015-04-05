@@ -10,7 +10,7 @@ File.open(tempfile.path, 'w') do |f|
   f.write(server.gen_key_pair.first)
 end
 
-Chef::LXC.create_fleet('zookeeper cluster') do |fleet|
+Chef::LXC.create_fleet('memcache') do |fleet|
   # Create base container with chef installed in it
   fleet.create_container('base') do |ct|
     ct.recipe do
