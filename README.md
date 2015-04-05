@@ -80,13 +80,13 @@ A more elaborate example,
 ### Automating multi container setup
 Chef-LXC provides `Chef::LXC.create_fleet` method to build chef managed
 multi container system. This can be used to prototype and test chef infrastructure.
-`Chef::LXC::Fleet` proivides helper methods to create containers as well as common
-chef operations helpers, like creating roles, environments, databags etc. Combining
-this two along with ancillay chef tools like chef-zero (for in memory chef server),
-berkshelf for cookbook management provides a complete chef-solo or chef-client/server
-like infrastructure.
+`Chef::LXC::Fleet` provides helper methods to create containers and perform common 
+chef administrative operations like creating roles, environments, databags etc. Combining
+these two along with ancillay chef tools like chef-zero (for in memory chef server),
+berkshelf for cookbook management, we can test and prototype chef-solo or chef-client/server
+managed infrastructure.
 
-Example:
+Following is an example:
 
   ```ruby
   require 'chef/lxc'
