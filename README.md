@@ -86,16 +86,26 @@ chef operations helpers, like creating roles, environments, databags etc.
   require 'chef/lxc'
   require 'chef_zero/server'
   require 'tempfile'
+  require 'berkshelf'
 
-  cookbook_path = File.expand_path('../../../data/cookbooks', __FILE__)
+  cookbook_path = File.expand_path('/tmp/cookbooks')
+
+  # Use berkshelf to venodirze cookbooks
+  berksfile = Berkshelf::Berksfile.from_file('/path/to/Berksfile')
+  berksfile.vendor('/tmp/cookbooks')
+
+  # Use chef zero as chef server, tell chef-zero to bind on lxcbr interface
   server = ChefZero::Server.new(host: '10.0.3.1', port: 8889)
-  server.start_background unless server.running?
+  server.start_background
+
+  # Generate temporary client key for knife operations
   tempfile = Tempfile.new('chef-lxc')
   File.open(tempfile.path, 'w') do |f|
     f.write(server.gen_key_pair.first)
   end
 
-  Chef::LXC.create_fleet('zookeeper cluster') do |fleet|
+
+  Chef::LXC.create_fleet('memcache') do |fleet|
     # Create base container with chef installed in it
     fleet.create_container('base') do |ct|
       ct.recipe do
@@ -116,7 +126,7 @@ chef operations helpers, like creating roles, environments, databags etc.
       end
     end
 
-    # configure chef setting for the new chef server
+    # configure chef setting for the chef zero server
     fleet.chef_config do |config|
       config[:client_key] = tempfile.path
       config[:node_name] = 'test'
@@ -130,6 +140,9 @@ chef operations helpers, like creating roles, environments, databags etc.
       ct.command('chef-client -r role[memcached]')
     end
   end
+
+  tempfile.unlink
+  server.stop
   ```
 
 ## Contributing
