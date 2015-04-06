@@ -12,7 +12,7 @@ describe Chef::Application::LXC do
   end
   it 'should install a package inside a container' do
     app = Chef::Application::LXC.new
-    app.config[:execute] = 'package "screen"'
+    app.config[:execute] = 'execute "apt-get update -y"'
     ARGV.clear
     ARGV << 'test'
     expect do
