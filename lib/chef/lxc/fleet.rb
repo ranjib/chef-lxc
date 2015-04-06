@@ -13,25 +13,18 @@ class Chef
       include Chef::LXC::KnifeHelper
 
       def create_container(name, opts = {})
-        from = opts[:from]
         force = opts[:force]
         ct = container(name)
-        if ct.defined? and force
-          ct.stop if ct.running?
-          ct.destroy
-          ct = container(name)
-        end
-        if from
-          base = container(from)
-          base.clone(name)
-          ct = container(name)
+        if ct.defined?
+          if force
+            ct.stop if ct.running?
+            ct.destroy
+            provision(name, opts)
+            ct = container(name)
+          end
         else
-          template = opts[:template] || 'download'
-          bdevtype = opts[:bdevtype]
-          bdevspecs = opts[:bdevspecs] || {}
-          flags = opts[:flags] || 0
-          args = opts[:flags] || %w(-d ubuntu -r trusty -a amd64)
-          ct.create(template, bdevtype, bdevspecs, flags, args)
+          provision(name, opts)
+          ct = container(name)
         end
         ct.start unless ct.running?
         while ct.ip_addresses.empty?
@@ -46,6 +39,24 @@ class Chef
         ct = ::LXC::Container.new(name)
         ct.extend Chef::LXC::ContainerHelper
         ct
+      end
+
+      private
+
+      def provision(name, opts)
+        from = opts[:from]
+        if from
+          base = container(from)
+          base.clone(name)
+        else
+          template = opts[:template] || 'download'
+          bdevtype = opts[:bdevtype]
+          bdevspecs = opts[:bdevspecs] || {}
+          flags = opts[:flags] || 0
+          args = opts[:flags] || %w(-d ubuntu -r trusty -a amd64)
+          ct = container(name)
+          ct.create(template, bdevtype, bdevspecs, flags, args)
+        end
       end
     end
   end
