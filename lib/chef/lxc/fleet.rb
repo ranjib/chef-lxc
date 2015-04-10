@@ -19,12 +19,10 @@ class Chef
           if force
             ct.stop if ct.running?
             ct.destroy
-            provision(name, opts)
-            ct = container(name)
+            ct = provision(name, opts)
           end
         else
-          provision(name, opts)
-          ct = container(name)
+          ct = provision(name, opts)
         end
         ct.start unless ct.running?
         while ct.ip_addresses.empty?
@@ -41,9 +39,7 @@ class Chef
         ct
       end
 
-      private
-
-      def provision(name, opts)
+      def provision(name, opts = {})
         from = opts[:from]
         if from
           base = container(from)
@@ -53,10 +49,11 @@ class Chef
           bdevtype = opts[:bdevtype]
           bdevspecs = opts[:bdevspecs] || {}
           flags = opts[:flags] || 0
-          args = opts[:flags] || %w(-d ubuntu -r trusty -a amd64)
+          args = opts[:args] || %w(-d ubuntu -r trusty -a amd64)
           ct = container(name)
           ct.create(template, bdevtype, bdevspecs, flags, args)
         end
+        container(name)
       end
     end
   end

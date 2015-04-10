@@ -100,4 +100,34 @@ describe Chef::LXC::Fleet do
     expect(role.run_list.count).to eq(1)
     expect(role.run_list.first.to_s).to eq('recipe[bar]')
   end
+
+  context '#provision' do
+    it 'uses ubuntu trusty amd64 by default' do
+      ct = double(::LXC::Container)
+      expect(ct).to receive(:create).with('download', nil,{}, 0, %w(-d ubuntu -r trusty -a amd64))
+      expect(::LXC::Container).to receive(:new).with('foo').twice.and_return(ct)
+      fleet.provision('foo')
+    end
+
+    it 'passes template and template arguments' do
+      ct = double(::LXC::Container)
+      expect(ct).to receive(:create).with('ubuntu', nil, {}, 0, %w(-r trusty -a amd64))
+      expect(::LXC::Container).to receive(:new).with('foo').twice.and_return(ct)
+      fleet.provision('foo', template: 'ubuntu', args: %w(-r trusty -a amd64))
+    end
+
+    it 'passes bdevtype and specs' do
+      ct = double(::LXC::Container)
+      expect(ct).to receive(:create).with('download', 'lvm',{baz: :bar}, 0, %w(-d ubuntu -r trusty -a amd64))
+      expect(::LXC::Container).to receive(:new).with('foo').twice.and_return(ct)
+      fleet.provision('foo', bdevtype: 'lvm', bdevspecs: {baz: :bar})
+    end
+
+    it 'passes clone flags' do
+      ct = double(::LXC::Container)
+      expect(ct).to receive(:create).with('download', nil, {}, 12, %w(-d ubuntu -r trusty -a amd64))
+      expect(::LXC::Container).to receive(:new).with('foo').twice.and_return(ct)
+      fleet.provision('foo', flags: 12)
+    end
+  end
 end
