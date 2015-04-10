@@ -11,10 +11,11 @@ class Chef
         recipe_in_container(self, recipe_content, &block)
       end
 
-      def command(command)
+      def command(command, opts = {})
+        live_stream = opts[:live_stream] || $stdout
         out = execute(wait: true) do
           cmd = Mixlib::ShellOut.new(command)
-          cmd.live_stream = $stdout
+          cmd.live_stream = live_stream
           cmd.run_command
           cmd.exitstatus
         end
