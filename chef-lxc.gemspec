@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.bindir        = "bin"
 
-  spec.add_dependency "chef", ">= 11"
+  spec.add_dependency "chef", ">= 12"
   spec.add_dependency "ruby-lxc"
   spec.add_dependency "lxc-extra"
   spec.homepage    = 'https://github.com/ranjib/chef-lxc'
