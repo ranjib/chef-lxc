@@ -7,3 +7,4 @@ RSpec::Core::RakeTask.new(:spec) do |t|
     a.push('--format progress')
   end.join(' ')
 end
+task :default => :spec
