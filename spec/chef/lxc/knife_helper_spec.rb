@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Chef::LXC::KnifeHelper do
   before(:each) do
+    fleet.chef_config({encrypted_data_bag_secret: 'secret'})
+
     allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with('secret').and_return(true)
     allow(IO).to receive(:read).and_call_original
@@ -9,25 +11,7 @@ describe Chef::LXC::KnifeHelper do
   end
 
   after(:each) do
-    chef_server.stop
-  end
-
-  def create_fleet(name)
-    chef_server.start_background unless chef_server.running?
-    tempfile = Tempfile.new('chef-lxc')
-    File.open(tempfile.path, 'w') do |f|
-      f.write(chef_server.gen_key_pair.first)
-    end
-
-    fleet = Chef::LXC.create_fleet(name)
-    fleet.chef_config do |config|
-      config[:client_key] = tempfile.path
-      config[:node_name] = 'test'
-      config[:chef_server_url] = 'http://10.0.3.1:8889'
-      config[:encrypted_data_bag_secret] = 'secret'
-    end
-
-    fleet
+    server.stop if server.running?
   end
 
   def create_data_bag(data_bag_name, hash, opts = {})
@@ -35,8 +19,8 @@ describe Chef::LXC::KnifeHelper do
     fleet.upload_data_bag_item_from_hash(data_bag_name, hash, opts)
   end
 
-  let(:chef_server) { ChefZero::Server.new(host: '10.0.3.1', port: 8889) }
-  let(:fleet) { create_fleet('knife-helper') }
+  let(:server) { ChefSpecHelper.new_server }
+  let(:fleet) { ChefSpecHelper.create_fleet(server) }
   let(:data_bag_name) { :data_bag_name }
   let(:item_name) { :item_name }
 
