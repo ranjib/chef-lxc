@@ -19,6 +19,28 @@ module LXCSpecHelper
   end
 end
 
+module ChefSpecHelper
+  def self.new_server
+    ChefZero::Server.new(host: '10.0.3.1', port: 8889)
+  end
+
+  def self.create_fleet(server)
+    server.start_background unless server.running?
+    tempfile = Tempfile.new('chef-lxc')
+    File.open(tempfile.path, 'w') do |f|
+      f.write(server.gen_key_pair.first)
+    end
+
+    Chef::LXC.create_fleet('chef-helper') do |fleet|
+      fleet.chef_config do |config|
+        config[:client_key] = tempfile.path
+        config[:node_name] = 'test'
+        config[:chef_server_url] = server.url
+      end
+    end
+  end
+end
+
 RSpec.configure do |config|
   config.expect_with(:rspec) { |c| c.syntax = :expect }
   config.filter_run(focus: true)
