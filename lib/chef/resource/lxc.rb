@@ -34,6 +34,11 @@ class Chef
         @flags = 0
         @config = {}
         @wait_for_network = true
+        @config_path = nil
+      end
+
+      def config_path(arg = nil)
+        set_or_return(:config_path, arg, kind_of: [ String ] )
       end
 
       def container_name(arg = nil)

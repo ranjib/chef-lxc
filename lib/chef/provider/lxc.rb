@@ -16,10 +16,8 @@ class Chef
       end
 
       def load_current_resource
-        @ct = ::LXC::Container.new(new_resource.container_name)
-        if (new_resource.action == 'start') or (new_resource.action == 'stop')
-          raise ArgumentError, 'Can not start or stop non-existent container'
-        end
+        config_path = new_resource.config_path || ::LXC.global_config_item('lxc.lxcpath')
+        @ct = ::LXC::Container.new(new_resource.container_name, config_path)
       end
 
       def action_create
