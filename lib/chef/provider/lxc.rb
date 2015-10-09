@@ -43,7 +43,12 @@ class Chef
       def update_config
         updated_items = []
         new_resource.config.each do |key, expected_value|
-          if ct.config_item(key) != expected_value
+          begin
+            if ct.config_item(key) != expected_value
+              ct.set_config_item(key, expected_value)
+              updated_items << key
+            end
+          rescue ::LXC::Error => e
             ct.set_config_item(key, expected_value)
             updated_items << key
           end
