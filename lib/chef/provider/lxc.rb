@@ -77,9 +77,14 @@ class Chef
           converge_by("start container '#{ct.name}'") do
             ct.start
             if new_resource.wait_for_network
-              while ct.ip_addresses.empty?
-                Chef::Log.error('waiting for ip allocation')
+              (1..10).each do
+                break unless ct.ip_addresses.empty?
+                Chef::Log.warn('waiting for ip allocation')
                 sleep 1
+              end
+              if (ct.ip_addresses.empty?)
+                Chef::Log.error('container network not coming up')
+                raise 'container network not coming up'
               end
             end
           end
