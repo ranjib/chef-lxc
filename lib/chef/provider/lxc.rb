@@ -1,4 +1,5 @@
 require 'chef/lxc_helper'
+require 'timeout'
 
 class Chef
   class Provider
@@ -77,18 +78,21 @@ class Chef
           converge_by("start container '#{ct.name}'") do
             ct.start
             if new_resource.wait_for_network
-              (1..10).each do
-                break unless ct.ip_addresses.empty?
-                Chef::Log.warn('waiting for ip allocation')
-                sleep 1
-              end
-              if (ct.ip_addresses.empty?)
-                Chef::Log.error('container network not coming up')
-                raise 'container network not coming up'
+              begin
+                Timeout::timeout(10) {
+                  while ct.ip_addresses.empty?
+                     Chef::Log.warn('waiting for ip allocation')
+                     sleep 1
+                  end
+                }
+              rescue Timeout::Error
+                  Chef::Log.error('container network not coming up')
+                  raise 'container network not coming up'
               end
             end
           end
         end
+
         unless new_resource.recipe_block.nil?
           recipe_in_container(ct, &new_resource.recipe_block)
         end
