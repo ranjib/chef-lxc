@@ -1,4 +1,5 @@
 require 'chef/lxc_helper'
+require 'timeout'
 
 class Chef
   class Provider
@@ -43,7 +44,12 @@ class Chef
       def update_config
         updated_items = []
         new_resource.config.each do |key, expected_value|
-          if ct.config_item(key) != expected_value
+          begin
+            if ct.config_item(key) != expected_value
+              ct.set_config_item(key, expected_value)
+              updated_items << key
+            end
+          rescue ::LXC::Error => e
             ct.set_config_item(key, expected_value)
             updated_items << key
           end
@@ -72,13 +78,21 @@ class Chef
           converge_by("start container '#{ct.name}'") do
             ct.start
             if new_resource.wait_for_network
-              until ct.ip_addresses.empty?
-                Chef::Log.debug('waiting for ip allocation')
-                sleep 1
+              begin
+                Timeout::timeout(10) {
+                  while ct.ip_addresses.empty?
+                     Chef::Log.warn('waiting for ip allocation')
+                     sleep 1
+                  end
+                }
+              rescue Timeout::Error
+                  Chef::Log.error('container network not coming up')
+                  raise 'container network not coming up'
               end
             end
           end
         end
+
         unless new_resource.recipe_block.nil?
           recipe_in_container(ct, &new_resource.recipe_block)
         end
